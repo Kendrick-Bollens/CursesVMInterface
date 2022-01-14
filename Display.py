@@ -2,7 +2,7 @@ import curses
 
 
 class Display:
-    def __init__(self, stdscr: 'curses._CursesWindow'):
+    def __init__(self, stdscr):
         self.stdscr = stdscr
         self.stdscr.nodelay(1)  # disable wait for user input
 
