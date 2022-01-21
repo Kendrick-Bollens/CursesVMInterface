@@ -5,39 +5,48 @@ class Display:
     def __init__(self, stdscr):
         self.stdscr = stdscr
         self.stdscr.nodelay(1)  # disable wait for user input
+        self.currentOptions = []
+        self.currentError = ""
 
-    def printVMSelectMenu(self, domains, cursorline):
-        # self.stdscr.erase()  # erase the old contents of the window
+    def printVMSelectMenu(self, cursorline):
+        self.stdscr.erase()  # erase the old contents of the window
         self.stdscr.addstr(0, 0, "Choose Your OS")
         self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(1, 0, self.currentError)
+        self.stdscr.clrtoeol()  # clear the rest of the line
         self.stdscr.addstr(2, 0, "↑/UP, ↓/DOWN, ENTER/CHOOSE")
         self.stdscr.clrtoeol()  # clear the rest of the line
-        self.printOptions(domains)
+        self.printOptions(self.currentOptions)
         self.updateCursor(cursorline)
         self.stdscr.refresh()
 
-    def printSelectedVMMenuStopped(self, vmname, options, cursorline):
-        # self.stdscr.erase()  # erase the old contents of the window
+    def printSelectedVMMenuStopped(self, vmname, cursorline):
+        self.stdscr.erase()  # erase the old contents of the window
         self.stdscr.addstr(0, 0, vmname + ": Stopped")
         self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(1, 0, self.currentError)
+        self.stdscr.clrtoeol()  # clear the rest of the line
         self.stdscr.addstr(2, 0, "↑/UP, ↓/DOWN, ENTER/CHOOSE")
         self.stdscr.clrtoeol()  # clear the rest of the line
-        self.printOptions(options)
+        self.printOptions(self.currentOptions)
         self.updateCursor(cursorline)
         self.stdscr.refresh()
 
-    def printSelectedVMMenuStarted(self, vmname, options, cursorline):
-        # self.stdscr.erase()  # erase the old contents of the window
+    def printSelectedVMMenuStarted(self, vmname, cursorline):
+        self.stdscr.erase()  # erase the old contents of the window
         self.stdscr.addstr(0, 0, vmname + ": Running")
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(1, 0, self.currentError)
         self.stdscr.clrtoeol()  # clear the rest of the line
         self.stdscr.addstr(2, 0, "↑/UP, ↓/DOWN, ENTER/CHOOSE")
         self.stdscr.clrtoeol()  # clear the rest of the line
-        self.printOptions(options)
+        self.printOptions(self.currentOptions)
         self.updateCursor(cursorline)
         self.stdscr.refresh()
 
     def printError(self, error, currentSelection):
-        self.stdscr.addstr(1, 0, error)
+        self.currentError = error
+        self.stdscr.addstr(1, 0, self.currentError)
         self.stdscr.clrtoeol()  # clear the rest of the line
         self.updateCursor(currentSelection)
         self.stdscr.refresh()

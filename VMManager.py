@@ -1,7 +1,14 @@
 import libvirt
 import sys
+import subprocess
 
 class VMManager:
+    # The Path of the new Images
+    serverPath = "/home/kenny/Desktop/NewVLAB"
+    # The Path of the read only Images
+    cleanPath = "/home/kenny/Desktop/VLAB"
+    # The Path of the Images wich are currently in use
+    workingPath = cleanPath + "/working"
 
     def __init__(self):
         self.path ="qemu:///system"
@@ -12,6 +19,7 @@ class VMManager:
             print(repr(e), file=sys.stderr)
             raise
 
+    #LIBVIRT
 
     def restartConnection(self):
 
@@ -98,3 +106,19 @@ class VMManager:
             exit(1)
 
         dom.destroy()
+
+    # FILE MANAGMENT
+
+    def resetImg(self, vmname):
+        #creatingWorkingdirectory if not exists
+        subprocess.check_output(["mkdir","-p",VMManager.workingPath])
+        # delte old file
+        subprocess.check_output(["rm", VMManager.workingPath + "/" + vmname + ".qcow2"])
+        # create new subimg
+        subprocess.check_output(
+            ["qemu-img", "create", "-f", "qcow2", "-F", "qcow2", "-b", VMManager.cleanPath + "/" + vmname + ".qcow2",
+             VMManager.workingPath + "/" + vmname + ".qcow2"])
+
+    def syncImgs(self):
+        #sync all files of the server into the local read only directory
+        subprocess.check_output(["rsync", "-a", VMManager.serverPath + "/", VMManager.cleanPath])

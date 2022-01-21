@@ -18,7 +18,7 @@ def c_main(stdscr: 'curses._CursesWindow') -> int:
 
 class VirtScreen:
     vmStartedOptions = ["Stop", "Restart", "Force Stop (only when crashed)"]
-    vmStoppedOptions = ["Start", "Reset", "Update", "Back to OS chooser"]
+    vmStoppedOptions = ["Start", "Start last state", "Back to OS chooser"]
 
     def __init__(self, stdscr: 'curses._CursesWindow'):
 
@@ -40,21 +40,22 @@ class VirtScreen:
 
         # The Screen displays the Selection Menu
         if self.currentScreen == "MenuSelectVM":
-            self.currentOptions = self.vmManager.getDomains()
-            self.display.printVMSelectMenu(self.currentOptions, self.currentSelection)
+            self.display.currentOptions = self.vmManager.getDomains()
+            self.display.currentOptions.append("Update")
+            self.display.printVMSelectMenu(self.currentSelection)
 
         # If a VM is selected check open the Menu to it
         elif self.currentScreen == "MenuVM" and self.currentVM != None:
 
             # Check if the VM is running and if it is print the started menu
             if self.vmManager.getDomainActive(self.currentVM):
-                self.currentOptions = VirtScreen.vmStartedOptions
-                self.display.printSelectedVMMenuStarted(self.currentVM, self.currentOptions, self.currentSelection)
+                self.display.currentOptions = VirtScreen.vmStartedOptions
+                self.display.printSelectedVMMenuStarted(self.currentVM, self.currentSelection)
 
             # If it is not running print the stopped menu
             else:
-                self.currentOptions = VirtScreen.vmStoppedOptions
-                self.display.printSelectedVMMenuStopped(self.currentVM, self.currentOptions, self.currentSelection)
+                self.display.currentOptions = VirtScreen.vmStoppedOptions
+                self.display.printSelectedVMMenuStopped(self.currentVM, self.currentSelection)
 
         # If a non existent menu is called reset to VMSelectMenu screen
         else:
@@ -70,22 +71,43 @@ class VirtScreen:
                 self.currentSelection -= 1
 
         if input == curses.KEY_DOWN and self.userCanSelect == 1:
-            if self.currentSelection < len(self.currentOptions) - 1:
+            if self.currentSelection < len(self.display.currentOptions) - 1:
                 self.currentSelection += 1
 
         if input == 10 and self.userCanSelect == 1:
-            self.optionSelection(self.currentOptions[self.currentSelection])
+            self.optionSelection(self.display.currentOptions[self.currentSelection])
+            self.currentSelection = 0
 
     def optionSelection(self, option):
         if option == "Start":
-            self.display.printError("The VM is Starting", self.currentSelection)
-            self.vmManager.startDomain(self.currentVM)
-            self.waitUntilDomActiveChangend(1)
+            try:
+                self.display.printError("The VM is Starting", self.currentSelection)
+                self.vmManager.resetImg(self.currentVM)
+                time.sleep(1)
+
+                self.vmManager.startDomain(self.currentVM)
+                self.waitUntilDomActiveChangend(1)
+            except Exception as e:
+                self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
+
+
+
+
+        if option == "Start last state":
+            try:
+                self.display.printError("The VM is Starting", self.currentSelection)
+                self.vmManager.startDomain(self.currentVM)
+                self.waitUntilDomActiveChangend(1)
+            except Exception as e:
+                self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
         elif option == "Stop":
-            self.display.printError("The VM is Stopping", self.currentSelection)
-            self.vmManager.stopDomain(self.currentVM)
-            self.waitUntilDomActiveChangend(0)
+            try:
+                self.display.printError("The VM is Stopping", self.currentSelection)
+                self.vmManager.stopDomain(self.currentVM)
+                self.waitUntilDomActiveChangend(0)
+            except Exception as e:
+                self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
 
         elif option == "Force Stop (only when crashed)":
             self.display.printError("The VM is Stopping", self.currentSelection)
@@ -99,10 +121,14 @@ class VirtScreen:
             self.waitUntilDomActiveChangend(1)
 
         elif option == "Update":
-            self.display.printError("Not Implemented", self.currentSelection)
+            self.display.printError("VMs are Updating", self.currentSelection)
+            try:
+                self.vmManager.syncImgs()
+                self.display.clearError(self.currentSelection)
+            # TODO Import new VMS
+            except Exception as e:
+                self.display.printError("Something went wrong with the syncing", self.currentSelection)
 
-        elif option == "Reset":
-            self.display.printError("Not Implemented", self.currentSelection)
 
         elif option == "Back to OS chooser":
             self.currentScreen = "MenuSelectVM"
