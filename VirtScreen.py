@@ -19,6 +19,7 @@ def c_main(stdscr: 'curses._CursesWindow') -> int:
 class VirtScreen:
     vmStartedOptions = ["Stop", "Restart", "Force Stop (only when crashed)"]
     vmStoppedOptions = ["Start", "Start last state", "Back to OS chooser"]
+    reallyUpdateOptions = ["Dont update","I know the risk, update"]
 
     def __init__(self, stdscr: 'curses._CursesWindow'):
 
@@ -57,6 +58,12 @@ class VirtScreen:
                 self.display.currentOptions = VirtScreen.vmStoppedOptions
                 self.display.printSelectedVMMenuStopped(self.currentVM, self.currentSelection)
 
+        #  Update Screen
+        elif self.currentScreen == "reallyUpdate":
+            self.display.currentOptions = VirtScreen.UpdateScreenOptions
+            self.display.printReallyUpdateMenu(self.currentSelection)
+
+
         # If a non existent menu is called reset to VMSelectMenu screen
         else:
             self.currentScreen = "MenuSelectVM"
@@ -90,9 +97,6 @@ class VirtScreen:
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
-
-
-
         if option == "Start last state":
             try:
                 self.display.printError("The VM is Starting", self.currentSelection)
@@ -121,14 +125,20 @@ class VirtScreen:
             self.waitUntilDomActiveChangend(1)
 
         elif option == "Update":
+            self.currentScreen = "reallyUpdate"
+
+        elif option == "I know the risk, update":
             self.display.printError("VMs are Updating", self.currentSelection)
             try:
                 self.vmManager.syncImgs()
                 self.display.clearError(self.currentSelection)
-            # TODO Import new VMS
+                self.vmManager.redefineAllImages()
             except Exception as e:
                 self.display.printError("Something went wrong with the syncing", self.currentSelection)
 
+        elif option == "Dont update":
+            self.currentScreen = "MenuSelectVM"
+            self.currentVM = None
 
         elif option == "Back to OS chooser":
             self.currentScreen = "MenuSelectVM"

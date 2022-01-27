@@ -1,6 +1,7 @@
 import libvirt
 import sys
 import subprocess
+import glob
 
 class VMManager:
     # The Path of the new Images
@@ -8,7 +9,7 @@ class VMManager:
     # The Path of the read only Images
     cleanPath = "/home/kenny/Desktop/VLAB"
     # The Path of the Images wich are currently in use
-    workingPath = cleanPath + "/working"
+    workingPath = "/home/kenny/Desktop/VLAB/working"
 
     def __init__(self):
         self.path ="qemu:///system"
@@ -103,9 +104,27 @@ class VMManager:
             dom = self.conn.lookupByName(domName)
         except libvirt.libvirtError as e:
             print(repr(e), file=sys.stderr)
-            exit(1)
+            raise
 
         dom.destroy()
+
+    def defineDomain(self,xml):
+        try:
+            self.conn.defineXMLFlags(xml, 0)
+        except libvirt.libvirtError as e:
+            print(repr(e), file=sys.stderr)
+            raise
+
+    def undefineDomain(self,domName):
+        dom = None
+        try:
+            dom = self.conn.lookupByName(domName)
+        except libvirt.libvirtError as e:
+            print(repr(e), file=sys.stderr)
+            raise
+
+        dom.undefine()
+
 
     # FILE MANAGMENT
 
@@ -122,3 +141,27 @@ class VMManager:
     def syncImgs(self):
         #sync all files of the server into the local read only directory
         subprocess.check_output(["rsync", "-a", VMManager.serverPath + "/", VMManager.cleanPath])
+
+    def redefineAllImages(self):
+
+        #undefine all domains
+        for domName in self.getDomains():
+            self.undefineDomain(domName)
+
+        xmlList = []
+        # getting all xml files
+        for xmlpath in glob.glob(VMManager.cleanPath + "*.xml"):
+            xml_file = open(xmlpath, "r")
+
+            # read whole file to a string
+            xmlList.append(xml_file.read())
+
+            # close file
+            xml_file.close()
+
+        # redifining all VMS from the XML Files
+        for xml in xmlList:
+            self.defineDomain(xml)
+
+
+
