@@ -60,7 +60,7 @@ class VirtScreen:
 
         #  Update Screen
         elif self.currentScreen == "reallyUpdate":
-            self.display.currentOptions = VirtScreen.UpdateScreenOptions
+            self.display.currentOptions = VirtScreen.reallyUpdateOptions
             self.display.printReallyUpdateMenu(self.currentSelection)
 
 
