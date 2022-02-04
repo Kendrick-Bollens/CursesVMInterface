@@ -3,7 +3,7 @@ import sys
 import subprocess
 import glob
 
-class VMManager:
+class VMManager(object):
     # The Path of the new Images
     serverPath = "/home/kenny/Desktop/NewVLAB"
     # The Path of the read only Images
@@ -123,7 +123,7 @@ class VMManager:
             print(repr(e), file=sys.stderr)
             raise
 
-        dom.undefine()
+        dom.undefineFlags(libvirt.VIR_DOMAIN_UNDEFINE_NVRAM)
 
 
     # FILE MANAGMENT
@@ -150,7 +150,7 @@ class VMManager:
 
         xmlList = []
         # getting all xml files
-        for xmlpath in glob.glob(VMManager.cleanPath + "*.xml"):
+        for xmlpath in glob.glob(VMManager.cleanPath + "/**/*.xml",recursive=True):
             xml_file = open(xmlpath, "r")
 
             # read whole file to a string

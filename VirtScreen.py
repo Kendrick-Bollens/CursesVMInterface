@@ -16,7 +16,7 @@ def c_main(stdscr: 'curses._CursesWindow') -> int:
         vscreen.checkForUserInput()
 
 
-class VirtScreen:
+class VirtScreen(object):
     vmStartedOptions = ["Stop", "Restart", "Force Stop (only when crashed)"]
     vmStoppedOptions = ["Start", "Start last state", "Back to OS chooser"]
     reallyUpdateOptions = ["Dont update","I know the risk, update"]
@@ -114,15 +114,23 @@ class VirtScreen:
                 self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
 
         elif option == "Force Stop (only when crashed)":
-            self.display.printError("The VM is Stopping", self.currentSelection)
-            self.vmManager.forceStopDomain(self.currentVM)
-            self.waitUntilDomActiveChangend(0)
+            try:
+                self.display.printError("The VM is Stopping", self.currentSelection)
+                self.vmManager.forceStopDomain(self.currentVM)
+                self.waitUntilDomActiveChangend(0)
+            except Exception as e:
+                self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
+
 
         elif option == "Restart":
-            self.display.printError("The VM is Restarting", self.currentSelection)
-            self.vmManager.restartDomain(self.currentVM)
-            time.sleep(20)
-            self.waitUntilDomActiveChangend(1)
+            try:
+                self.display.printError("The VM is Restarting", self.currentSelection)
+                self.vmManager.restartDomain(self.currentVM)
+                time.sleep(20)
+                self.waitUntilDomActiveChangend(1)
+            except Exception as e:
+                self.display.printError("Something went wrong with the Restarting of the VM", self.currentSelection)
+
 
         elif option == "Update":
             self.currentScreen = "reallyUpdate"

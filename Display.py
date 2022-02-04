@@ -1,7 +1,7 @@
 import curses
 
 
-class Display:
+class Display(object):
     def __init__(self, stdscr):
         self.stdscr = stdscr
         self.stdscr.nodelay(1)  # disable wait for user input
