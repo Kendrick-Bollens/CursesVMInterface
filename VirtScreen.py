@@ -43,6 +43,7 @@ class VirtScreen(object):
         if self.currentScreen == "MenuSelectVM":
             self.display.currentOptions = self.vmManager.getDomains()
             self.display.currentOptions.append("Update")
+            self.display.currentOptions.append("Reboot")
             self.display.printVMSelectMenu(self.currentSelection)
 
         # If a VM is selected check open the Menu to it
@@ -131,6 +132,8 @@ class VirtScreen(object):
             except Exception as e:
                 self.display.printError("Something went wrong with the Restarting of the VM", self.currentSelection)
 
+        elif option == "Reboot":
+            os.system('reboot')
 
         elif option == "Update":
             self.currentScreen = "reallyUpdate"
