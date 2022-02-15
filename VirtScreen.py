@@ -1,5 +1,6 @@
 import curses
 import time
+import os
 from Display import Display
 from VMManager import VMManager
 
@@ -98,7 +99,7 @@ class VirtScreen(object):
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
-        if option == "Start last state":
+        elif option == "Start last state":
             try:
                 self.display.printError("The VM is Starting", self.currentSelection)
                 self.vmManager.startDomain(self.currentVM)

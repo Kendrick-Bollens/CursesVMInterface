@@ -6,13 +6,13 @@ import os
 
 class VMManager(object):
     # The Path of the new Images
-    pathOfServerDirectory = "/pathToServer" # username@remote_host:/home/username/dir1 place_to_sync_on_local_machine
+    pathOfServerDirectory = "osvl-images@osvl-serv.th-brandenburg.de:/srv/osvl/domains" # username@remote_host:/home/username/dir1 place_to_sync_on_local_machine
     # The Path of the read only Images
     pathOfCleanImages = "/vlab/domains"
     # The Path of the Images wich are currently in use
     pathOfWorkingImages = "/vlab/working"
     # The Path of the script that runs on sync
-    pathOfScript = "./vlab/synced/script.sh"
+    pathOfScript = "./vlab/vlab-setup/prepare_domain_xml.sh"
 
     def __init__(self):
         # start the connection to Libvirt
@@ -141,8 +141,10 @@ class VMManager(object):
 
     def resetImg(self, vmname):
         #creatingWorkingdirectory if not exists
-        subprocess.check_output(["mkdir","-p", VMManager.pathOfWorkingImages], stderr=subprocess.STDOUT)
-
+        try:
+            subprocess.check_output(["mkdir","-p", VMManager.pathOfWorkingImages], stderr=subprocess.STDOUT)
+        except Exception as e:
+            pass
 
         #search for path of old file
         for path in glob.glob(VMManager.pathOfWorkingImages+"/**/"+vmname+".qcow2",recursive=True):
@@ -150,7 +152,7 @@ class VMManager(object):
             subprocess.check_output(["rm", path], stderr=subprocess.STDOUT)
 
         #search for path of new file
-        newFilePath = glob.glob(VMManager.pathOfCleanImages+"/**/"+vmname+".qcow2")[1]
+        newFilePath = glob.glob(VMManager.pathOfCleanImages+"/**/"+vmname+".qcow2")[0]
 
 
         # create new subimg
@@ -161,7 +163,8 @@ class VMManager(object):
     def syncImgs(self):
         # sync all files of the server into the local read only directory
         try:
-            subprocess.check_output(["rsync", "-a", VMManager.pathOfServerDirectory + "/", VMManager.pathOfCleanImages], stderr=subprocess.STDOUT)
+            #subprocess.check_output(["rsync", "-rlpt", VMManager.pathOfServerDirectory + "/", VMManager.pathOfCleanImages], stderr=subprocess.STDOUT)
+            pass #TODO uncomment if working
         except Exception as e:
             pass
 
