@@ -5,6 +5,8 @@ class Display(object):
     def __init__(self):
         self.stdscr = curses.initscr()
         curses.noecho() # Disable key echoing
+        curses.raw()
+        self.stdscr.keypad(True)
         self.stdscr.nodelay(1)  # disable wait for user input
         self.currentOptions = []
         self.currentError = ""
