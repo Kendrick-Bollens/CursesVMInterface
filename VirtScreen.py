@@ -71,21 +71,30 @@ class VirtScreen(object):
         # Catch input
         input = self.display.getInput()
 
+
         # check what the input means
+
+        #Key Up
         if input == curses.KEY_UP and self.userCanSelect == 1:
             if self.currentSelection > 0:
                 self.currentSelection -= 1
 
+        #Key Down
         if input == curses.KEY_DOWN and self.userCanSelect == 1:
             if self.currentSelection < len(self.display.currentOptions) - 1:
                 self.currentSelection += 1
 
+        #Enter
         if input == 10 and self.userCanSelect == 1:
             self.optionSelection(self.display.currentOptions[self.currentSelection])
             self.currentSelection = 0
 
     def optionSelection(self, option):
-        if option == "Start":
+
+
+        #Screen Options MenuVM Stopped
+
+        if self.currentScreen == "MenuVM" and option == "Start":
             try:
                 self.display.printError("The VM is Starting", self.currentSelection)
                 self.vmManager.resetImg(self.currentVM)
@@ -96,7 +105,7 @@ class VirtScreen(object):
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
-        elif option == "Start last state":
+        elif self.currentScreen == "MenuVM" and option == "Start last state":
             try:
                 self.display.printError("The VM is Starting", self.currentSelection)
                 self.vmManager.startDomain(self.currentVM)
@@ -104,7 +113,14 @@ class VirtScreen(object):
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
-        elif option == "Stop":
+        elif self.currentScreen == "MenuVM" and option == "Back to OS chooser":
+            self.currentScreen = "MenuSelectVM"
+            self.currentVM = None
+
+
+        #Screen Options MenuVM Started
+
+        elif self.currentScreen == "MenuVM" and option == "Stop":
             try:
                 self.display.printError("The VM is Stopping", self.currentSelection)
                 self.vmManager.stopDomain(self.currentVM)
@@ -112,7 +128,7 @@ class VirtScreen(object):
             except Exception as e:
                 self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
 
-        elif option == "Force Stop (only when crashed)":
+        elif self.currentScreen == "MenuVM" and option == "Force Stop (only when crashed)":
             try:
                 self.display.printError("The VM is Stopping", self.currentSelection)
                 self.vmManager.forceStopDomain(self.currentVM)
@@ -121,7 +137,7 @@ class VirtScreen(object):
                 self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
 
 
-        elif option == "Restart":
+        elif self.currentScreen == "MenuVM" and option == "Restart":
             try:
                 self.display.printError("The VM is Restarting", self.currentSelection)
                 self.vmManager.restartDomain(self.currentVM)
@@ -130,13 +146,10 @@ class VirtScreen(object):
             except Exception as e:
                 self.display.printError("Something went wrong with the Restarting of the VM", self.currentSelection)
 
-        elif option == "Reboot":
-            os.system('reboot')
 
-        elif option == "Update":
-            self.currentScreen = "reallyUpdate"
+        # Screen Options ReallyUpdate
 
-        elif option == "I know the risk, update":
+        elif self.currentScreen == "reallyUpdate" and option == "I know the risk, update":
             self.display.printError("VMs are Updating", self.currentSelection)
             try:
                 self.vmManager.syncImgs()
@@ -144,15 +157,23 @@ class VirtScreen(object):
                 self.vmManager.redefineAllImages()
             except Exception as e:
                 self.display.printError("Something went wrong with the syncing", self.currentSelection)
-
-        elif option == "Dont update":
             self.currentScreen = "MenuSelectVM"
             self.currentVM = None
 
-        elif option == "Back to OS chooser":
+        elif self.currentScreen == "reallyUpdate" and option == "Dont update":
             self.currentScreen = "MenuSelectVM"
             self.currentVM = None
-        else:
+
+
+        #Screen Options MenuSelectVM
+
+        elif self.currentScreen == "MenuSelectVM" and option == "Update":
+            self.currentScreen = "reallyUpdate"
+
+        elif self.currentScreen == "MenuSelectVM" and option == "Reboot":
+            os.system('reboot')
+
+        elif self.currentScreen == "MenuSelectVM":
             self.currentVM = option
             self.currentScreen = "MenuVM"
 
