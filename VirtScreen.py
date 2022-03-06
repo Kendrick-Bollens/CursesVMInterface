@@ -5,16 +5,13 @@ from Display import Display
 from VMManager import VMManager
 
 
-def main() -> int:
-    # Wrapped Main to not destroy anything cli related
-    return curses.wrapper(c_main)
-
-
-def c_main(stdscr: 'curses._CursesWindow') -> int:
-    vscreen = VirtScreen(stdscr)
+def start():
     while True:
-        vscreen.updateScreen()
-        vscreen.checkForUserInput()
+        vscreen = VirtScreen()
+        while True:
+            vscreen.updateScreen()
+            vscreen.checkForUserInput()
+        curses.endwin()
 
 
 class VirtScreen(object):
@@ -22,11 +19,11 @@ class VirtScreen(object):
     vmStoppedOptions = ["Start", "Start last state", "Back to OS chooser"]
     reallyUpdateOptions = ["Dont update","I know the risk, update"]
 
-    def __init__(self, stdscr: 'curses._CursesWindow'):
+    def __init__(self):
 
         # Get the classes to Display and Manage the Vms
         self.vmManager = VMManager()
-        self.display = Display(stdscr)
+        self.display = Display()
 
         # Set the defaults
         self.currentScreen = "MenuSelectVM"
@@ -195,5 +192,3 @@ class VirtScreen(object):
         return False
 
 
-if __name__ == '__main__':
-    exit(main())

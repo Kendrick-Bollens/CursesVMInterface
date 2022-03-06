@@ -2,8 +2,9 @@ import curses
 
 
 class Display(object):
-    def __init__(self, stdscr):
-        self.stdscr = stdscr
+    def __init__(self):
+        self.stdscr = curses.initscr()
+        curses.noecho() # Disable key echoing
         self.stdscr.nodelay(1)  # disable wait for user input
         self.currentOptions = []
         self.currentError = ""
