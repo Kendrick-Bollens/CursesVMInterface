@@ -6,7 +6,7 @@ import os
 
 class VMManager(object):
     # The Path of the new Images
-    pathOfServerDirectory = "osvl-images@osvl-serv.th-brandenburg.de:/srv/osvl/domains" # username@remote_host:/home/username/dir1 place_to_sync_on_local_machine
+    pathOfServerDirectory = "" # username@remote_host:/path/to/dir
     # The Path of the read only Images
     pathOfCleanImages = "/vlab/domains"
     # The Path of the Images wich are currently in use
@@ -162,10 +162,13 @@ class VMManager(object):
 
     def syncImgs(self):
         # sync all files of the server into the local read only directory
-        try:
-            #subprocess.check_output(["rsync", "-rlpt", VMManager.pathOfServerDirectory + "/", VMManager.pathOfCleanImages], stderr=subprocess.STDOUT)
-            pass #TODO uncomment if working
-        except Exception as e:
+        if VMManager.pathOfServerDirectory:
+            try:
+                subprocess.check_output(["rsync", "-rlpt", VMManager.pathOfServerDirectory + "/", VMManager.pathOfCleanImages], stderr=subprocess.STDOUT)
+
+            except Exception as e:
+                pass
+        else:
             pass
 
     def redefineAllImages(self):
