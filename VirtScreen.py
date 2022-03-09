@@ -129,9 +129,6 @@ class VirtScreen(object):
         elif self.currentScreen == "MenuVM" and option == "Back to OS chooser":
             self.currentScreen = "MenuSelectVM"
             self.currentVM = None
-
-        elif self.currentScreen == "MenuVM" and option == "Reload":
-            self.currentScreen = "reallyReloadVM"
             
 
         #Screen Options MenuVM Started
@@ -215,6 +212,10 @@ class VirtScreen(object):
 
 
         #Screen Options MenuSelectVM
+
+        elif self.currentScreen == "MenuSelectVM" and option == "Reload":
+            self.currentScreen = "reallyReloadVM"
+
 
         elif self.currentScreen == "MenuSelectVM" and option == "Update":
             self.currentScreen = "reallyUpdateAll"
