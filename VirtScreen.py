@@ -47,7 +47,7 @@ class VirtScreen(object):
             self.display.currentOptions = self.vmManager.getDomains()
             self.display.currentOptions.extend(VirtScreen.MenuSelectVMOptions)
             self.display.printVMSelectMenu(self.currentSelection)
-            self.display.printError("The current user is: " + getpass.getuser())
+            self.display.printError("The current user is: " + getpass.getuser(),self.currentSelection)
 
         # If a VM is selected check open the Menu to it
         elif self.currentScreen == "MenuVM" and self.currentVM != None:
@@ -117,7 +117,7 @@ class VirtScreen(object):
 
                 self.vmManager.startDomain(self.currentVM)
                 self.waitUntilDomActiveChangend(1)
-                self.display.printError("Pls press the white button")
+                self.display.printError("Pls press the white button",self.currentSelection)
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
@@ -126,7 +126,7 @@ class VirtScreen(object):
                 self.display.printError("The VM is Starting", self.currentSelection)
                 self.vmManager.startDomain(self.currentVM)
                 self.waitUntilDomActiveChangend(1)
-                self.display.printError("Pls press the white button")
+                self.display.printError("Pls press the white button",self.currentSelection)
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
