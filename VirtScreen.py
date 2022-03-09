@@ -20,7 +20,7 @@ class VirtScreen(object):
     reallyUpdateAllOptions = ["Dont update","I know the risk, update"]
     reallyUpdateVMOptions = ["Dont update","I know the risk, update"]
     reallyReloadVMOptions = ["Dont reload","I know the risk, reload"]
-    MenuSelectVMOptins = ["Reload","Update", "Reboot"]
+    MenuSelectVMOptions = ["Reload","Update", "Reboot"]
 
 
     def __init__(self):
@@ -44,7 +44,7 @@ class VirtScreen(object):
         # The Screen displays the Selection Menu
         if self.currentScreen == "MenuSelectVM":
             self.display.currentOptions = self.vmManager.getDomains()
-            self.display.currentOptions.extend(MenuSelectVMOptins)
+            self.display.currentOptions.extend(VirtScreen.MenuSelectVMOptions)
             self.display.printVMSelectMenu(self.currentSelection)
 
         # If a VM is selected check open the Menu to it
