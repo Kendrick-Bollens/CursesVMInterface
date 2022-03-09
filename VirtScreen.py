@@ -1,6 +1,7 @@
 import curses
 import time
 import os
+import getpass
 from Display import Display
 from VMManager import VMManager
 
@@ -46,6 +47,7 @@ class VirtScreen(object):
             self.display.currentOptions = self.vmManager.getDomains()
             self.display.currentOptions.extend(VirtScreen.MenuSelectVMOptions)
             self.display.printVMSelectMenu(self.currentSelection)
+            self.display.printError("The current user is: " + getpass.getuser())
 
         # If a VM is selected check open the Menu to it
         elif self.currentScreen == "MenuVM" and self.currentVM != None:
