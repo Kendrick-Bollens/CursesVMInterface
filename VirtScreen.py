@@ -117,6 +117,7 @@ class VirtScreen(object):
 
                 self.vmManager.startDomain(self.currentVM)
                 self.waitUntilDomActiveChangend(1)
+                self.display.printError("Pls press the white button")
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
@@ -125,6 +126,7 @@ class VirtScreen(object):
                 self.display.printError("The VM is Starting", self.currentSelection)
                 self.vmManager.startDomain(self.currentVM)
                 self.waitUntilDomActiveChangend(1)
+                self.display.printError("Pls press the white button")
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
 
