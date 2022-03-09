@@ -33,7 +33,7 @@ class VirtScreen(object):
         # Set the defaults
         self.currentScreen = "MenuSelectVM"
         self.currentSelection = 0
-        self.userCanSelect = 1  # describes if the user can select a option
+        self.userCanSelect = 1  # describes if the user can select ann option
 
     # update the screen corresponding if the user can choose a vm is selected or is running
     def updateScreen(self):
@@ -50,7 +50,7 @@ class VirtScreen(object):
             self.display.printError("The current user is: " + getpass.getuser(),self.currentSelection)
 
         # If a VM is selected check open the Menu to it
-        elif self.currentScreen == "MenuVM" and self.currentVM != None:
+        elif self.currentScreen == "MenuVM" and self.currentVM is not None:
 
             # Check if the VM is running and if it is print the started menu
             if self.vmManager.getDomainActive(self.currentVM):
@@ -116,7 +116,7 @@ class VirtScreen(object):
                 time.sleep(1)
 
                 self.vmManager.startDomain(self.currentVM)
-                self.waitUntilDomActiveChangend(1)
+                self.waitUntilDomActiveChanged(1)
                 self.display.printError("Pls press the white button",self.currentSelection)
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
@@ -125,7 +125,7 @@ class VirtScreen(object):
             try:
                 self.display.printError("The VM is Starting", self.currentSelection)
                 self.vmManager.startDomain(self.currentVM)
-                self.waitUntilDomActiveChangend(1)
+                self.waitUntilDomActiveChanged(1)
                 self.display.printError("Pls press the white button",self.currentSelection)
             except Exception as e:
                 self.display.printError("Something went wrong with the Starting of the VM", self.currentSelection)
@@ -141,7 +141,7 @@ class VirtScreen(object):
             try:
                 self.display.printError("The VM is Stopping", self.currentSelection)
                 self.vmManager.stopDomain(self.currentVM)
-                self.waitUntilDomActiveChangend(0)
+                self.waitUntilDomActiveChanged(0)
             except Exception as e:
                 self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
 
@@ -149,7 +149,7 @@ class VirtScreen(object):
             try:
                 self.display.printError("The VM is Stopping", self.currentSelection)
                 self.vmManager.forceStopDomain(self.currentVM)
-                self.waitUntilDomActiveChangend(0)
+                self.waitUntilDomActiveChanged(0)
             except Exception as e:
                 self.display.printError("Something went wrong with the Stopping of the VM", self.currentSelection)
 
@@ -159,7 +159,7 @@ class VirtScreen(object):
                 self.display.printError("The VM is Restarting", self.currentSelection)
                 self.vmManager.restartDomain(self.currentVM)
                 time.sleep(20)
-                self.waitUntilDomActiveChangend(1)
+                self.waitUntilDomActiveChanged(1)
             except Exception as e:
                 self.display.printError("Something went wrong with the Restarting of the VM", self.currentSelection)
 
@@ -231,17 +231,17 @@ class VirtScreen(object):
             self.currentVM = option
             self.currentScreen = "MenuVM"
 
-    def waitUntilDomActiveChangend(self, status, timeout=30, period=0.25):
+    def waitUntilDomActiveChanged(self, status, timeout=30, period=0.25):
 
         # Define Time to end
-        mustend = time.time() + timeout
+        must_end = time.time() + timeout
 
         # Disable the user input
         self.userCanSelect = 0
         self.display.disableCursor()
 
         # run as long the vm is starting/stopping or if the max time is overwritten
-        while time.time() < mustend:
+        while time.time() < must_end:
 
             # if the status changes break the loop and enable the cursor again
             if status == self.vmManager.getDomainActive(self.currentVM):
@@ -253,7 +253,7 @@ class VirtScreen(object):
             # sleep for slower polling rate
             time.sleep(period)
 
-        # print error that it couldnt start/stop
+        # print error that it couldn't start/stop
         if status == 1:
             self.display.printError("The VM couldn't Start", self.currentSelection)
         if status == 0:
@@ -263,7 +263,7 @@ class VirtScreen(object):
         self.display.enableCursor()
         self.userCanSelect = 1
 
-        # return that it didnt could change
+        # return that it didn't could change
         return False
 
 
