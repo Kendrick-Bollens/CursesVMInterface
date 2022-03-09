@@ -16,8 +16,12 @@ def start():
 
 class VirtScreen(object):
     vmStartedOptions = ["Stop", "Restart", "Force Stop (only when crashed)"]
-    vmStoppedOptions = ["Start", "Start last state", "Back to OS chooser"]
-    reallyUpdateOptions = ["Dont update","I know the risk, update"]
+    vmStoppedOptions = ["Start", "Start last state","Update", "Back to OS chooser"]
+    reallyUpdateAllOptions = ["Dont update","I know the risk, update"]
+    reallyUpdateVMOptions = ["Dont update","I know the risk, update"]
+    reallyReloadVMOptions = ["Dont reload","I know the risk, reload"]
+    MenuSelectVMOptins = ["Reload","Update", "Reboot"]
+
 
     def __init__(self):
 
@@ -40,8 +44,7 @@ class VirtScreen(object):
         # The Screen displays the Selection Menu
         if self.currentScreen == "MenuSelectVM":
             self.display.currentOptions = self.vmManager.getDomains()
-            self.display.currentOptions.append("Update")
-            self.display.currentOptions.append("Reboot")
+            self.display.currentOptions.extend(MenuSelectVMOptins)
             self.display.printVMSelectMenu(self.currentSelection)
 
         # If a VM is selected check open the Menu to it
@@ -57,11 +60,21 @@ class VirtScreen(object):
                 self.display.currentOptions = VirtScreen.vmStoppedOptions
                 self.display.printSelectedVMMenuStopped(self.currentVM, self.currentSelection)
 
-        #  Update Screen
-        elif self.currentScreen == "reallyUpdate":
-            self.display.currentOptions = VirtScreen.reallyUpdateOptions
-            self.display.printReallyUpdateMenu(self.currentSelection)
+        # Reload All Screen
+        elif self.currentScreen == "reallyReloadAll":
+            self.display.currentOptions = VirtScreen.reallyReloadVMOptions
+            self.display.printReallyReloadAllMenu(self.currentSelection)
 
+
+        # Update ALl Screen
+        elif self.currentScreen == "reallyUpdateAll":
+            self.display.currentOptions = VirtScreen.reallyUpdateAllOptions
+            self.display.printReallyUpdateAllMenu(self.currentSelection)
+            
+        # Update VM Screen
+        elif self.currentScreen == "reallyUpdateVM":
+            self.display.currentOptions = VirtScreen.reallyUpdateVMOptions
+            self.display.printReallyUpdateVMMenu(self.currentSelection)
 
         # If a non existent menu is called reset to VMSelectMenu screen
         else:
@@ -117,6 +130,9 @@ class VirtScreen(object):
             self.currentScreen = "MenuSelectVM"
             self.currentVM = None
 
+        elif self.currentScreen == "MenuVM" and option == "Reload":
+            self.currentScreen = "reallyReloadVM"
+            
 
         #Screen Options MenuVM Started
 
@@ -147,12 +163,45 @@ class VirtScreen(object):
                 self.display.printError("Something went wrong with the Restarting of the VM", self.currentSelection)
 
 
-        # Screen Options ReallyUpdate
+        # Screen Options ReallyUpdateAll
+        elif self.currentScreen == "reallyReloadAllVM" and option == "I know the risk, reload":
+            self.display.printError("VMs are Reloading", self.currentSelection)
+            try:
+                self.vmManager.redefineImage(self.currentVM)
+                self.display.clearError(self.currentSelection)
+            except Exception as e:
+                self.display.printError("Something went wrong with the reload", self.currentSelection)
+            self.currentScreen = "MenuVM"
+            self.currentVM = None
 
-        elif self.currentScreen == "reallyUpdate" and option == "I know the risk, update":
+        elif self.currentScreen == "reallyReloadVM" and option == "Dont reload":
+            self.currentScreen = "MenuVM"
+            self.currentVM = None
+
+
+
+        # Screen Options ReallyUpdateVM
+
+        elif self.currentScreen == "reallyUpdateVM" and option == "I know the risk, update":
             self.display.printError("VMs are Updating", self.currentSelection)
             try:
-                self.vmManager.syncImgs()
+                self.vmManager.syncImg(self.currentVM)
+                self.display.clearError(self.currentSelection)
+                self.vmManager.redefineImage(self.currentVM)
+            except Exception as e:
+                self.display.printError("Something went wrong with the syncing", self.currentSelection)
+            self.currentScreen = "MenuVM"
+
+        elif self.currentScreen == "reallyUpdateVM" and option == "Dont update":
+            self.currentScreen = "MenuVM"
+
+
+        # Screen Options ReallyUpdateAll
+
+        elif self.currentScreen == "reallyUpdateAll" and option == "I know the risk, update":
+            self.display.printError("VMs are Updating", self.currentSelection)
+            try:
+                self.vmManager.syncAllImgs()
                 self.display.clearError(self.currentSelection)
                 self.vmManager.redefineAllImages()
             except Exception as e:
@@ -160,7 +209,7 @@ class VirtScreen(object):
             self.currentScreen = "MenuSelectVM"
             self.currentVM = None
 
-        elif self.currentScreen == "reallyUpdate" and option == "Dont update":
+        elif self.currentScreen == "reallyUpdateAll" and option == "Dont update":
             self.currentScreen = "MenuSelectVM"
             self.currentVM = None
 
@@ -168,7 +217,7 @@ class VirtScreen(object):
         #Screen Options MenuSelectVM
 
         elif self.currentScreen == "MenuSelectVM" and option == "Update":
-            self.currentScreen = "reallyUpdate"
+            self.currentScreen = "reallyUpdateAll"
 
         elif self.currentScreen == "MenuSelectVM" and option == "Reboot":
             os.system('reboot')

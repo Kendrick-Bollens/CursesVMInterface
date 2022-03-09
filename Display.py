@@ -47,9 +47,33 @@ class Display(object):
         self.updateCursor(cursorline)
         self.stdscr.refresh()
 
-    def printReallyUpdateMenu(self,cursorline):
+    def printReallyReloadAllMenu(self,cursorline):
         self.stdscr.erase()  # erase the old contents of the window
-        self.stdscr.addstr(0, 0, "This Update may require some time and will RESET all images are you sure that you want to do it")
+        self.stdscr.addstr(0, 0, "This  will RESET all images, are you sure that you want to do it?")
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(1, 0, self.currentError)
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(2, 0, "↑/UP, ↓/DOWN, ENTER/CHOOSE")
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.printOptions(self.currentOptions)
+        self.updateCursor(cursorline)
+        self.stdscr.refresh()
+
+    def printReallyUpdateAllMenu(self,cursorline):
+        self.stdscr.erase()  # erase the old contents of the window
+        self.stdscr.addstr(0, 0, "This update may require some time and will RESET all images, are you sure that you want to do it?")
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(1, 0, self.currentError)
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.stdscr.addstr(2, 0, "↑/UP, ↓/DOWN, ENTER/CHOOSE")
+        self.stdscr.clrtoeol()  # clear the rest of the line
+        self.printOptions(self.currentOptions)
+        self.updateCursor(cursorline)
+        self.stdscr.refresh()
+
+    def printReallyUpdateVMMenu(self,cursorline):
+        self.stdscr.erase()  # erase the old contents of the window
+        self.stdscr.addstr(0, 0, "This update may require some time and will RESET the image, are you sure that you want to do it?")
         self.stdscr.clrtoeol()  # clear the rest of the line
         self.stdscr.addstr(1, 0, self.currentError)
         self.stdscr.clrtoeol()  # clear the rest of the line

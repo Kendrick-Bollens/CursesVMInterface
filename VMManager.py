@@ -160,7 +160,20 @@ class VMManager(object):
             ["qemu-img", "create", "-f", "qcow2", "-F", "qcow2", "-b", newFilePath,
              VMManager.pathOfWorkingImages + "/" + vmname + ".qcow2"], stderr=subprocess.STDOUT)
 
-    def syncImgs(self):
+    def syncImg(self,vmname):
+        # sync all files of the server into the local read only directory
+        if VMManager.pathOfServerDirectory:
+            try:
+                subprocess.check_output(
+                    ["rsync", "-rlpt", VMManager.pathOfServerDirectory + "/"+vmname, VMManager.pathOfCleanImages+"/"+vmname],
+                    stderr=subprocess.STDOUT)
+
+            except Exception as e:
+                pass
+        else:
+            pass
+
+    def syncAllImgs(self):
         # sync all files of the server into the local read only directory
         if VMManager.pathOfServerDirectory:
             try:
@@ -170,6 +183,35 @@ class VMManager(object):
                 pass
         else:
             pass
+
+    def redefineImage(self,vmname):
+
+        #undefine image
+        self.undefineDomain(vmname)
+
+        #remove working image
+        try:
+            subprocess.check_output(["rm", VMManager.pathOfWorkingImages+"/"+vmname+".qcow2"], stderr=subprocess.STDOUT)
+        except Exception as e:
+            pass
+
+        # run shellscript to generate xml
+        try:
+            subprocess.check_output([VMManager.pathOfScript, VMManager.pathOfCleanImages+"/"+vmname], stderr=subprocess.STDOUT)
+        except Exception as e:
+            pass
+
+        # load file
+        xml_file = open(VMManager.pathOfCleanImages+"/"+vmname+"/"+vmname+".xml", "r")
+
+        # read whole file to a string
+        xmlList.append(xml_file.read())
+
+        # close file
+        xml_file.close()
+        # redifining VM from the XML File
+        self.redefineImage(vmname)
+
 
     def redefineAllImages(self):
 
